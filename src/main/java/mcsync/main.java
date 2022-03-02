@@ -8,6 +8,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +28,7 @@ public void onEnable() {
      this.saveDefaultConfig();
      int pluginId = 14009;
      Metrics metrics = new Metrics(this, pluginId);
+     this.getCommand("mcsync").setExecutor(new CommandMcsync());
      }
  
 @EventHandler
@@ -52,7 +56,14 @@ public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
 	          } 
 	          if (!authorized) {e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); }
           }
+
+
+public class CommandMcsync implements CommandExecutor {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        return true;
+    }
+}
+
+
+
      }
-
-
-

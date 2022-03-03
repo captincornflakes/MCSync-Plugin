@@ -35,7 +35,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/Workspace/mcsync/Minecraft_server_1.18.1.jar"/>
-	<classpathentry kind="lib" path="D:/Workspace/mcsync/spigot-1.18.1.jar"/>
+	<classpathentry kind="lib" path="E:/Workspace/Minecraft_server_1.18.1.jar"/>
+	<classpathentry kind="lib" path="E:/Workspace/spigot-1.18.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

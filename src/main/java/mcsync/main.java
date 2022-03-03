@@ -22,14 +22,14 @@ public class main extends JavaPlugin implements Listener{
 FileConfiguration config = getConfig();
 
 public void onEnable() {
-    Bukkit.getPluginManager().registerEvents(this, (Plugin)this); 
-	 String serverKey = config.getString("serverKEY");
-     System.out.println("[MC-Sync] MCSync is alive, Your server key is " + serverKey);
-     this.saveDefaultConfig();
-     int pluginId = 14009;
-     Metrics metrics = new Metrics(this, pluginId);
-     this.getCommand("mcsync").setExecutor(new CommandMcsync());
-     }
+	Bukkit.getPluginManager().registerEvents(this, (Plugin)this); 
+	String serverKey = config.getString("serverKEY");
+	System.out.println("[MC-Sync] MCSync is alive, Your server key is " + serverKey);
+	this.saveDefaultConfig();
+	int pluginId = 14009;
+	Metrics metrics = new Metrics(this, pluginId);
+	this.getCommand("mcsync").setExecutor(new CommandMcsync());
+}
  
 @EventHandler
 public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
@@ -54,16 +54,40 @@ public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
 		       message = config.getString("message-error");
 		   } 
 	          } 
-	          if (!authorized) {e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); }
-          }
-
-
-public class CommandMcsync implements CommandExecutor {
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        return true;
-    }
+          if (!authorized) {e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); }
 }
 
 
+public class CommandMcsync implements CommandExecutor {
+	String prefix = "[MCS] ";
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		 if (args.length == 0){
+			 sender.sendMessage(prefix + "Correct usage: /mcsync <token-set>");
+	         return false;
+	     	}
+		 if (args.length > 0){
+			 if (args[0].equalsIgnoreCase("set")){
+					config.set("serverKEY", args[1]);
+					saveConfig();
+					System.out.println(prefix + "Your server key is: " + args[1]);
+					sender.sendMessage(prefix + "Server key set");
+					return true;
+			 	}
+			 else if (args[0].equalsIgnoreCase("get")){
+				 	String serverKey = config.getString("serverKEY");
+					sender.sendMessage(prefix + "Server key is: " + serverKey);
+					return true;
+			 	}
+			 else if (args[0].equalsIgnoreCase("test")){
+			 	}
+			 else {
+				 sender.sendMessage(prefix + "Unknown Command");
+		         return false;
+			 	}
+		 	}
+		return false;
+		}
+	}
 
-     }
+
+}

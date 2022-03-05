@@ -34,42 +34,38 @@ public void onEnable() {
 	String serverKey = config.getString("serverKEY");
 	System.out.println(prefix + "MCSync is alive, Your server key is " + serverKey);
 	this.saveDefaultConfig();
-	
-	try {
-		this.createCustomConfig();
-	} catch (InvalidConfigurationException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	
+	this.createCustomConfig();
 	int pluginId = 14009;
 	Metrics metrics = new Metrics(this, pluginId);
 	this.getCommand("mcsync").setExecutor(new CommandMcsync());
 }
 
 public FileConfiguration getCustomConfig() {
-	return this.customConfig;
+	return this.messagesConfig;
 }
 
-private void createCustomConfig() throws InvalidConfigurationException {
-	customConfigFile = new File(getDataFolder(), "messages.yml");
+public void createCustomConfig() {
+	customConfigFile = new File(this.getDataFolder(), "messages.yml");
 	if (!customConfigFile.exists()) {
 		customConfigFile.getParentFile().mkdirs();
 		saveResource("messages.yml", false);
 	}
-	
-	customConfig = new YamlConfiguration();
+	messagesConfig = new YamlConfiguration();
 	try {
-		customConfig.load(customConfigFile);
+		messagesConfig.load(customConfigFile);
 	} catch (IOException | InvalidConfigurationException e){
 		e.printStackTrace();
 	}
+
 }
  
 @EventHandler
 public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
      String message = messagesConfig.getString("message-allow");
+     String error = messagesConfig.getString("message-error");
+     String fail = messagesConfig.getString("message-fail");
      String serverKey = config.getString("serverKEY");
+     
      boolean authorized = false;
      if (getServer().getWhitelistedPlayers().stream().anyMatch(player -> player.getUniqueId().equals(e.getUniqueId()))) {
           authorized = true;
@@ -83,10 +79,10 @@ public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
 			 String result = reader.readLine();
 			 reader.close();
 			 if (result.equals("true")) { authorized = true; }
-			 else { message = messagesConfig.getString(prefix + "message-fail"); } 
+			 else { message = fail; } 
 			 } 
 		 catch (IOException ignored) {
-		       message = messagesConfig.getString(prefix + "message-error");
+		       message = error;
 		   } 
 	          } 
           if (!authorized) {e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); }

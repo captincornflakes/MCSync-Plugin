@@ -1,6 +1,7 @@
 package mcsync;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -10,15 +11,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
- 
+
 public class main extends JavaPlugin implements Listener{
 FileConfiguration config = getConfig();
+FileConfiguration messagesConfig = getCustomConfig();
+
+private File customConfigFile;
+private FileConfiguration customConfig;
 
 String prefix = "[MCS] ";
 
@@ -28,14 +35,41 @@ public void onEnable() {
 	String serverKey = config.getString("serverKEY");
 	System.out.println(prefix + "MCSync is alive, Your server key is " + serverKey);
 	this.saveDefaultConfig();
+	
+	try {
+		this.createCustomConfig();
+	} catch (InvalidConfigurationException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
 	int pluginId = 14009;
 	Metrics metrics = new Metrics(this, pluginId);
 	this.getCommand("mcsync").setExecutor(new CommandMcsync());
 }
+
+public FileConfiguration getCustomConfig() {
+	return this.customConfig;
+}
+
+private void createCustomConfig() throws InvalidConfigurationException {
+	customConfigFile = new File(getDataFolder(), "messages.yml");
+	if (!customConfigFile.exists()) {
+		customConfigFile.getParentFile().mkdirs();
+		saveResource("messages.yml", false);
+	}
+	
+	customConfig = new YamlConfiguration();
+	try {
+		customConfig.load(customConfigFile);
+	} catch (IOException | InvalidConfigurationException e){
+		e.printStackTrace();
+	}
+}
  
 @EventHandler
 public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
-     String message = config.getString("message-allow");
+     String message = messagesConfig.getString("message-allow");
      String serverKey = config.getString("serverKEY");
      boolean authorized = false;
      if (getServer().getWhitelistedPlayers().stream().anyMatch(player -> player.getUniqueId().equals(e.getUniqueId()))) {
@@ -50,10 +84,10 @@ public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
 			 String result = reader.readLine();
 			 reader.close();
 			 if (result.equals("true")) { authorized = true; }
-			 else { message = config.getString(prefix + "message-fail"); } 
+			 else { message = messagesConfig.getString(prefix + "message-fail"); } 
 			 } 
 		 catch (IOException ignored) {
-		       message = config.getString(prefix + "message-error");
+		       message = messagesConfig.getString(prefix + "message-error");
 		   } 
 	          } 
           if (!authorized) {e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); }

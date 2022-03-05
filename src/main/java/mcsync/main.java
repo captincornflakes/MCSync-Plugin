@@ -24,7 +24,6 @@ FileConfiguration config = getConfig();
 FileConfiguration messagesConfig = getCustomConfig();
 
 private File customConfigFile;
-private FileConfiguration customConfig;
 
 String prefix = "[MCS] ";
 

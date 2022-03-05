@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,9 +25,8 @@ FileConfiguration config = getConfig();
 FileConfiguration messagesConfig = getCustomConfig();
 
 private File customConfigFile;
-private FileConfiguration customConfig;
 
-String prefix = "[MCS] ";
+String prefix = ChatColor.LIGHT_PURPLE + "[" + ChatColor.BLUE + "MCSYNC" + ChatColor.LIGHT_PURPLE + "] " + ChatColor.RESET ;
 
 
 public void onEnable() {
@@ -93,16 +93,16 @@ public class CommandMcsync implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 	     String serverKey = config.getString("serverKEY");
 		 if (args.length == 0){
-			 sender.sendMessage(prefix + "Correct usage: /mcsync <Argument>");
+			 sender.sendMessage(prefix + ChatColor.RED + "Correct usage: /mcsync <Argument>");
 	     	}
 		 if (args.length > 0){
 			 if (args[0].equalsIgnoreCase("set")){
 					config.set("serverKEY", args[1]);
-					sender.sendMessage(prefix + "Server key set to " + args[1]);
+					sender.sendMessage(prefix + ChatColor.AQUA + "Server key set to " + ChatColor.GREEN + args[1]);
 					saveConfig();
 			 	}
 			 else if (args[0].equalsIgnoreCase("get")){
-					sender.sendMessage(prefix + "Server key is: " + serverKey);
+					sender.sendMessage(prefix + ChatColor.AQUA + "Server key is: " + ChatColor.GREEN + serverKey);
 			 	}
 			 else if (args[0].equalsIgnoreCase("test")){
 				 try {
@@ -112,10 +112,10 @@ public class CommandMcsync implements CommandExecutor {
 					 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 					 String result = reader.readLine();
 					 reader.close();
-					 if (result.equals("true")) { sender.sendMessage(prefix + "Congradulations your Key is valid.");  }
-					 else { sender.sendMessage(prefix + "Oops, Your key is invalid."); } 
+					 if (result.equals("true")) { sender.sendMessage(prefix + ChatColor.GREEN + "Congratz! Your token is valid!");  }
+					 else { sender.sendMessage(prefix + ChatColor.RED + "Oops, Your key is invalid!"); } 
 					 } 
-				 catch (IOException ignored) {sender.sendMessage(prefix + "Something went wrong.");} 
+				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 1");} 
 			 	}
 			 else if (args[0].equalsIgnoreCase("mode")){
 				 try {
@@ -125,8 +125,8 @@ public class CommandMcsync implements CommandExecutor {
 					 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 					 String result = reader.readLine();
 					 reader.close();
-					 sender.sendMessage(prefix + "Your server mode is: " + result);					 } 
-				 catch (IOException ignored) {sender.sendMessage(prefix + "Something went wrong.");} 
+					 sender.sendMessage(prefix + ChatColor.AQUA + "Your server mode is set to: " + ChatColor.GREEN + result);					 } 
+				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 2");} 
 			 	}
 
 			 else if (args[0].equalsIgnoreCase("version")){
@@ -137,11 +137,11 @@ public class CommandMcsync implements CommandExecutor {
 					 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 					 String result = reader.readLine();
 					 reader.close();
-					 sender.sendMessage(prefix + "The latest version is : " + result);					 } 
-				 catch (IOException ignored) {sender.sendMessage(prefix + "Something went wrong.");} 
+					 sender.sendMessage(prefix + ChatColor.AQUA + "The latest version is : " + ChatColor.GREEN + result);					 } 
+				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 3");} 
 			 	}
 			 else {
-				 sender.sendMessage(prefix + "Unknown Command");
+				 sender.sendMessage(prefix + ChatColor.RED + "Unknown Command");
 		         return false;
 			 	}
 		 	}

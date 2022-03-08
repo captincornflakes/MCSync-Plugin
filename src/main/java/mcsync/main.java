@@ -92,12 +92,19 @@ public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
 public class CommandMcsync implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 	     String serverKey = config.getString("serverKEY");
-		 if (args.length == 0){
-			 sender.sendMessage(prefix + ChatColor.RED + "Correct usage: /mcsync <Argument>");
+		 if (args.length == 0 || args[0].equalsIgnoreCase("help")){
+			 sender.sendMessage("" + ChatColor.LIGHT_PURPLE + ChatColor.STRIKETHROUGH + "--------------------------------------------");
+			 sender.sendMessage(ChatColor.GOLD + "The following are valid commands for MCSync");
+			 sender.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "/mcs set" + ChatColor.GRAY + ChatColor.ITALIC + " (Used to set server token)");
+			 sender.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "/mcs get" + ChatColor.GRAY + ChatColor.ITALIC + " (Show your server token)");
+			 sender.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "/mcs test" + ChatColor.GRAY + ChatColor.ITALIC + " (Test connection to MCSync)");
+			 sender.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "/mcs mode" + ChatColor.GRAY + ChatColor.ITALIC + " (Show which mode your token is set to)");
+			 sender.sendMessage(ChatColor.GOLD + "| " + ChatColor.YELLOW + "/mcs version" + ChatColor.GRAY + ChatColor.ITALIC + " (Check Local Build number and Current Released Build number)");
+			 sender.sendMessage("" + ChatColor.LIGHT_PURPLE + ChatColor.STRIKETHROUGH + "--------------------------------------------");
 	     	}
-		 if (args.length > 0){
+		 else if (args.length > 0){
 			 if (args[0].equalsIgnoreCase("set")){
-				 if (args.length < 2){sender.sendMessage(prefix + ChatColor.AQUA + "Please supply a server Key");}
+				 if (args.length < 2){sender.sendMessage(prefix + ChatColor.RED + "Please supply a server Key");}
 				 else {
 						config.set("serverKEY", args[1]);
 						sender.sendMessage(prefix + ChatColor.AQUA + "Server key set to " + ChatColor.GREEN + args[1]);
@@ -105,7 +112,7 @@ public class CommandMcsync implements CommandExecutor {
 						}
 			 	}
 			 else if (args[0].equalsIgnoreCase("get")){
-					sender.sendMessage(prefix + ChatColor.AQUA + "Server key is: " + ChatColor.GREEN + serverKey);
+					sender.sendMessage(prefix + ChatColor.AQUA + "Your server key is: " + ChatColor.GREEN + serverKey);
 			 	}
 			 else if (args[0].equalsIgnoreCase("test")){
 				 try {
@@ -145,7 +152,7 @@ public class CommandMcsync implements CommandExecutor {
 			 	}
 			 else {
 				 sender.sendMessage(prefix + ChatColor.RED + "Unknown Command");
-		         return false;
+		         return true;
 			 	}
 		 	}
 		return true;

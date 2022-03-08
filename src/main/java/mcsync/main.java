@@ -97,9 +97,12 @@ public class CommandMcsync implements CommandExecutor {
 	     	}
 		 if (args.length > 0){
 			 if (args[0].equalsIgnoreCase("set")){
-					config.set("serverKEY", args[1]);
-					sender.sendMessage(prefix + ChatColor.AQUA + "Server key set to " + ChatColor.GREEN + args[1]);
-					saveConfig();
+				 if (args.length < 2){sender.sendMessage(prefix + ChatColor.AQUA + "Please supply a server Key");}
+				 else {
+						config.set("serverKEY", args[1]);
+						sender.sendMessage(prefix + ChatColor.AQUA + "Server key set to " + ChatColor.GREEN + args[1]);
+						saveConfig();
+						}
 			 	}
 			 else if (args[0].equalsIgnoreCase("get")){
 					sender.sendMessage(prefix + ChatColor.AQUA + "Server key is: " + ChatColor.GREEN + serverKey);

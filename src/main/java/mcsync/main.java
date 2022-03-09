@@ -18,21 +18,26 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 
 public class main extends JavaPlugin implements Listener{
 FileConfiguration config = getConfig();
+PluginDescriptionFile versionNumber = this.getDescription();
 FileConfiguration messagesConfig = getCustomConfig();
 
 private File customConfigFile;
 
-String prefix = ChatColor.LIGHT_PURPLE + "[" + ChatColor.BLUE + "MCSYNC" + ChatColor.LIGHT_PURPLE + "] " + ChatColor.RESET ;
+String prefix = ChatColor.LIGHT_PURPLE + "[" + ChatColor.BLUE + "MCSync" + ChatColor.LIGHT_PURPLE + "] " + ChatColor.RESET ;
 
 
 public void onEnable() {
 	Bukkit.getPluginManager().registerEvents(this, (Plugin)this); 
 	String serverKey = config.getString("serverKEY");
-	System.out.println(prefix + "MCSync is alive, Your server key is " + serverKey);
+	System.out.println("MCSync is alive, Your server key is " + serverKey);
 	this.saveDefaultConfig();
 	this.createCustomConfig();
 	int pluginId = 14009;
@@ -104,7 +109,9 @@ public class CommandMcsync implements CommandExecutor {
 	     	}
 		 else if (args.length > 0){
 			 if (args[0].equalsIgnoreCase("set")){
-				 if (args.length < 2){sender.sendMessage(prefix + ChatColor.RED + "Please supply a server Key");}
+				 if (args.length < 2){
+					 sender.sendMessage(prefix + ChatColor.RED + "Please supply a server Key");
+					 }
 				 else {
 						config.set("serverKEY", args[1]);
 						sender.sendMessage(prefix + ChatColor.AQUA + "Server key set to " + ChatColor.GREEN + args[1]);
@@ -125,7 +132,7 @@ public class CommandMcsync implements CommandExecutor {
 					 if (result.equals("true")) { sender.sendMessage(prefix + ChatColor.GREEN + "Congratz! Your token is valid!");  }
 					 else { sender.sendMessage(prefix + ChatColor.RED + "Oops, Your key is invalid!"); } 
 					 } 
-				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 1");} 
+				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 1)");} 
 			 	}
 			 else if (args[0].equalsIgnoreCase("mode")){
 				 try {
@@ -136,7 +143,7 @@ public class CommandMcsync implements CommandExecutor {
 					 String result = reader.readLine();
 					 reader.close();
 					 sender.sendMessage(prefix + ChatColor.AQUA + "Your server mode is set to: " + ChatColor.GREEN + result);					 } 
-				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 2");} 
+				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 2)");} 
 			 	}
 
 			 else if (args[0].equalsIgnoreCase("version")){
@@ -147,8 +154,10 @@ public class CommandMcsync implements CommandExecutor {
 					 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 					 String result = reader.readLine();
 					 reader.close();
-					 sender.sendMessage(prefix + ChatColor.AQUA + "The latest version is : " + ChatColor.GREEN + result);					 } 
-				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 3");} 
+					 String pluginVersion = versionNumber.getVersion();
+					 sender.sendMessage(prefix + ChatColor.AQUA + "Your current version: " + ChatColor.GREEN + pluginVersion);
+					 sender.sendMessage(prefix + ChatColor.AQUA + "The latest version is: " + ChatColor.GREEN + result);					 } 
+				 catch (IOException ignored) {sender.sendMessage(prefix + ChatColor.RED + "Something went wrong. (Error: 3)");} 
 			 	}
 			 else {
 				 sender.sendMessage(prefix + ChatColor.RED + "Unknown Command");

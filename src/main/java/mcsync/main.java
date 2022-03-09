@@ -21,9 +21,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
-
 public class main extends JavaPlugin implements Listener{
 FileConfiguration config = getConfig();
 PluginDescriptionFile versionNumber = this.getDescription();

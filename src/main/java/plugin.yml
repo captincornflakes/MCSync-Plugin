@@ -9,4 +9,4 @@ commands:
         usage: /<command> [help|get|test|set|mode|version]
         aliases: [mcs]
         description: Check for new Version.
-        permission: mcsync.
+        permission: mcsync.admin

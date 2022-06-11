@@ -5,7 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -25,19 +29,40 @@ FileConfiguration config = getConfig();
 FileConfiguration messagesConfig = getCustomConfig();
 
 private File customConfigFile;
-
 String prefix = ChatColor.LIGHT_PURPLE + "[" + ChatColor.BLUE + "MCSYNC" + ChatColor.LIGHT_PURPLE + "] " + ChatColor.RESET ;
-
+String endpointLocation = "https://mcsync.live/api/join.php";
+String api_version = "&version=V2";
+String serverPort = "&port=" + Bukkit.getPort();
 
 public void onEnable() {
 	Bukkit.getPluginManager().registerEvents(this, (Plugin)this); 
 	String serverKey = config.getString("serverKEY");
-	System.out.println(prefix + "MCSync is alive, Your server key is " + serverKey);
 	this.saveDefaultConfig();
 	this.createCustomConfig();
 	int pluginId = 14009;
 	Metrics metrics = new Metrics(this, pluginId);
 	this.getCommand("mcsync").setExecutor(new CommandMcsync());
+	String serverAddress = "";
+	try {
+		serverAddress = "&address=" + InetAddress.getLocalHost();
+	} catch (UnknownHostException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	
+	try {
+		URL url = new URL(endpointLocation + "?serverKEY=" + serverKey + serverAddress + serverPort + api_version);
+		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+		connection.setRequestMethod("GET");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		reader.close();
+		System.out.println(prefix + "MCSync Can connect to API");
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		System.out.println(prefix + "MCSync Cannot connect to API");
+	}
+		
+
 }
 
 public FileConfiguration getCustomConfig() {
@@ -60,33 +85,37 @@ public void createCustomConfig() {
 }
  
 @EventHandler
-public void onPlayerJoin(AsyncPlayerPreLoginEvent e) {
-     String message = messagesConfig.getString("message-allow");
-     String error = messagesConfig.getString("message-error");
-     String fail = messagesConfig.getString("message-fail");
-     String serverKey = config.getString("serverKEY");
-     
-     boolean authorized = false;
-     if (getServer().getWhitelistedPlayers().stream().anyMatch(player -> player.getUniqueId().equals(e.getUniqueId()))) {
-          authorized = true;
-     } 
-     else {
-		 try {
-			 URL url = new URL("https://mcsync.live/api/join.php?serverKEY=" + serverKey + "&UUID=" + e.getUniqueId().toString().replace("-", ""));
-			 HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-			 connection.setRequestMethod("GET");
-			 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			 String result = reader.readLine();
-			 reader.close();
-			 if (result.equals("true")) { authorized = true; }
-			 else { message = fail; } 
-			 } 
-		 catch (IOException ignored) {
-		       message = error;
-		   } 
-	          } 
-          if (!authorized) {e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); }
-}
+public void onPlayerJoin(AsyncPlayerPreLoginEvent e) throws Exception {
+    String message = messagesConfig.getString("message-allow");
+    String error = messagesConfig.getString("message-error");
+    String fail = messagesConfig.getString("message-fail");
+    String serverKey = config.getString("serverKEY");
+    boolean authorized = false;
+	try {
+		URL url = new URL(endpointLocation + "?serverKEY=" + serverKey + "&UUID=" + e.getUniqueId().toString().replace("-", "") + api_version);
+		HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+		connection.setRequestMethod("GET");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		String result = reader.readLine();
+		reader.close();
+		if (result.equals("true")) { 
+			authorized = true; 
+			}
+		else { 
+			message = fail; 
+			} 
+		} 
+	 catch (IOException ignored) {
+		 	message = error;
+	 		} 
+	
+   if (getServer().getWhitelistedPlayers().stream().anyMatch(player -> player.getUniqueId().equals(e.getUniqueId()))) {
+        authorized = true;
+   } 
+   else {
+    	if (!authorized) {e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); }
+   		}
+   }
 
 
 public class CommandMcsync implements CommandExecutor {
@@ -116,7 +145,7 @@ public class CommandMcsync implements CommandExecutor {
 			 	}
 			 else if (args[0].equalsIgnoreCase("test")){
 				 try {
-					 URL url = new URL("https://mcsync.live/api/join.php?serverKEY=" + serverKey + "&test=true");
+					 URL url = new URL(endpointLocation + "?serverKEY=" + serverKey + "&test=true" + api_version);
 					 HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 					 connection.setRequestMethod("GET");
 					 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -129,7 +158,7 @@ public class CommandMcsync implements CommandExecutor {
 			 	}
 			 else if (args[0].equalsIgnoreCase("mode")){
 				 try {
-					 URL url = new URL("https://mcsync.live/api/join.php?serverKEY=" + serverKey + "&mode=true");
+					 URL url = new URL(endpointLocation + "?serverKEY=" + serverKey + "&mode=true" + api_version);
 					 HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 					 connection.setRequestMethod("GET");
 					 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -141,7 +170,7 @@ public class CommandMcsync implements CommandExecutor {
 
 			 else if (args[0].equalsIgnoreCase("version")){
 				 try {
-					 URL url = new URL("https://mcsync.live/api/join.php?update=true");
+					 URL url = new URL(endpointLocation + "?update=true" + api_version);
 					 HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 					 connection.setRequestMethod("GET");
 					 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));

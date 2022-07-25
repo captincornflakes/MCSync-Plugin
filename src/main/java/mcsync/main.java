@@ -18,9 +18,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -105,16 +107,21 @@ public void onPlayerJoin(AsyncPlayerPreLoginEvent e) throws Exception {
 			message = fail; 
 			} 
 		} 
-	 catch (IOException ignored) {
+	catch (IOException ignored) {
 		 	message = error;
 	 		} 
-	
-   if (getServer().getWhitelistedPlayers().stream().anyMatch(player -> player.getUniqueId().equals(e.getUniqueId()))) {
+	if (getServer().getWhitelistedPlayers().stream().anyMatch(player -> player.getUniqueId().equals(e.getUniqueId()))) {
         authorized = true;
-   } 
-   else {
-    	if (!authorized) {e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); }
-   		}
+   		} 
+   	if (((Permissible) e).hasPermission("mcsync.whitelist")) {
+       authorized = true;
+   		} 
+   	if (((Permissible) e).hasPermission("mcsync.blacklist")) {
+       authorized = false;
+   		} 
+   if (!authorized) {
+	   e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message); 
+	   }
    }
 
 

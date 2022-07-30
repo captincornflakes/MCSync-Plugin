@@ -113,34 +113,39 @@ public class main extends JavaPlugin implements Listener{
 	
 	@EventHandler(priority = EventPriority.LOW)
 	public void onPlayerJoin(AsyncPlayerPreLoginEvent e) throws Exception {
-	    String message = this.messagesConfig.getString("message-allow");
+	    String message = null;
 	    String error = this.messagesConfig.getString("message-error");
 	    String fail = this.messagesConfig.getString("message-fail");
 	    String serverKey = this.config.getString("serverKEY");
-	    boolean authorized = false;
-	    try {
-	    	URL url = new URL(String.valueOf(this.endpointLocation) + "?serverKEY=" + serverKey + "&UUID=" + e.getUniqueId().toString().replace("-", "") + this.api_version);
-	    	HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-	    	connection.setRequestMethod("GET");
-	    	BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-	    	String result = reader.readLine();
-	    	reader.close();
-	    	if (result.equals("true")) {
-	    		authorized = true;
-	      		} 
-	    	else {
-	    		message = fail;
-	      		} 
-	    	} 
-	    catch (IOException ignored) {
-	    	message = error;
-	    	} 
+	    boolean authorized = false;  
 	    if (getServer().getWhitelistedPlayers().stream().anyMatch(player -> player.getUniqueId().equals(e.getUniqueId()))) {
 	    	authorized = true;
-	    	} 
-	    else if (!authorized) {
+	    	}
+	    else {
+	    	 try {
+	 	    	URL url = new URL(String.valueOf(this.endpointLocation) + "?serverKEY=" + serverKey + "&UUID=" + e.getUniqueId().toString().replace("-", "") + this.api_version);
+	 	    	HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+	 	    	connection.setRequestMethod("GET");
+	 	    	BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	 	    	String result = reader.readLine();
+	 	    	reader.close();
+	 	    	if (result.equals("true")) {
+	 	    		authorized = true;
+	 	      		} 
+	 	    	else {
+	 	    		message = fail;
+	 	      		} 
+	 	    	} 
+	 	    catch (IOException ignored) {
+	 	    	message = error;
+	 	    	}
+	    	}
+	   
+	    if (!authorized) {
 	    	e.disallow(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST, message);
 	    	} 
+	    
+	    // send message if owner has whitelist enabled on login and on enableing of whitelist
 	   }
 
 	  public class CommandMcsync implements CommandExecutor {
